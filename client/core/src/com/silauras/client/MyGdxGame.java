@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.silauras.client.entities.Character;
+import com.silauras.client.entities.PlayerCharacter;
 
 public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -17,13 +19,14 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	private OrthographicCamera camera;
 	private Vector2 desiredPosition; // Позиция, к которой стремится камера
-	private final static float CAMERA_LERP_SPEED = 0.1f; // Скорость интерполяции (значение от 0 до 1)
+	private float lerpSpeed = 0.1f; // Скорость интерполяции (значение от 0 до 1)
+	private float cameraZoom = 1.0f; // Масштаб камеры
 
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		character = new Character(new Vector2(10, 10), new Texture(TextureConstants.BASIC_CHARACTER_TEXTURE_PATH));
+		character = new PlayerCharacter(new Vector2(10, 10), new Texture(TextureConstants.BASIC_CHARACTER_TEXTURE_PATH));
 		tilemap = new Tilemap(10, 10, 32, 32, new Texture(TextureConstants.BASIC_FLOOR_TILE_TEXTURE_PATH));
 
 		camera = new OrthographicCamera();
@@ -37,18 +40,9 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	@Override
 	public void render() {
-		// Обработка пользовательского ввода
-		handleKeyboardInput();
-
-		// Обновляем желаемую позицию камеры на основе позиции персонажа
-		desiredPosition.set(character.getPosition().x + character.getTexture().getWidth() / 2f,
-				character.getPosition().y + character.getTexture().getHeight() / 2f);
-
-		// Интерполируем текущую позицию камеры к желаемой позиции
-		float lerpX = Interpolation.linear.apply(camera.position.x, desiredPosition.x, CAMERA_LERP_SPEED);
-		float lerpY = Interpolation.linear.apply(camera.position.y, desiredPosition.y, CAMERA_LERP_SPEED);
-		camera.position.set(lerpX, lerpY, 0);
-		camera.update();
+		// Обновляем камеру и пользовательский ввод
+		updateCamera();
+		handleInput();
 
 		// Устанавливаем матрицу проекции для SpriteBatch
 		batch.setProjectionMatrix(camera.combined);
@@ -60,7 +54,39 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.end();
 	}
 
-	private void handleKeyboardInput() {
+	@Override
+	public void dispose() {
+		batch.dispose();
+		character.getTexture().dispose();
+		tilemap.dispose();
+	}
+
+	private void updateCamera() {
+		// Обновляем желаемую позицию камеры на основе позиции персонажа
+		desiredPosition.set(character.getPosition().x + character.getTexture().getWidth() / 2f,
+				character.getPosition().y + character.getTexture().getHeight() / 2f);
+
+		// Интерполируем текущую позицию камеры к желаемой позиции
+		float lerpX = Interpolation.linear.apply(camera.position.x, desiredPosition.x, lerpSpeed);
+		float lerpY = Interpolation.linear.apply(camera.position.y, desiredPosition.y, lerpSpeed);
+		camera.position.set(lerpX, lerpY, 0);
+
+		// Устанавливаем масштаб камеры
+		camera.zoom = cameraZoom;
+
+		camera.update();
+	}
+
+	private void handleInput() {
+		// Обработка клавиш + и - для управления масштабом камеры
+		if (Gdx.input.isKeyJustPressed(Input.Keys.PLUS) || Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)) {
+			cameraZoom += 0.1f;
+		}
+		if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS)) {
+			cameraZoom -= 0.1f;
+			if (cameraZoom < 0.1f) cameraZoom = 0.1f;
+		}
+
 		float speed = 5f;
 
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -75,12 +101,5 @@ public class MyGdxGame extends ApplicationAdapter {
 		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
 			character.getPosition().y -= speed;
 		}
-	}
-
-	@Override
-	public void dispose() {
-		batch.dispose();
-		character.getTexture().dispose();
-		tilemap.dispose();
 	}
 }

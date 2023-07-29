@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$/client" />
             <option value="$PROJECT_DIR$/client/core" />
             <option value="$PROJECT_DIR$/client/desktop" />
+            <option value="$PROJECT_DIR$/client/entities" />
           </set>
         </option>
       </GradleProjectSettings>

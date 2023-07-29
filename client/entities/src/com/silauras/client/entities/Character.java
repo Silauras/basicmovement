@@ -1,9 +1,9 @@
-package com.silauras.client;
+package com.silauras.client.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
-public class Character {
+public abstract  class Character {
 
     private final Texture texture;
     private Vector2 position;
@@ -24,4 +24,5 @@ public class Character {
     public void setPosition(Vector2 position) {
         this.position = position;
     }
+
 }
