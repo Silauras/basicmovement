@@ -6,6 +6,7 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://clojars.org/repo/" }
         google()
     }
     dependencies {
@@ -59,6 +60,7 @@ project(":core") {
 
     dependencies {
         implementation project(":entities")
+        implementation project(":shared")
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
@@ -73,6 +75,8 @@ project(":entities"){
 
 
     dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.28'
+
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
@@ -81,3 +85,33 @@ project(":entities"){
 
     }
 }
+
+project(":server"){
+    apply plugin: "java-library"
+
+
+    dependencies {
+        implementation project(":shared")
+        testImplementation platform('org.junit:junit-bom:5.9.1')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        implementation 'kryonet:kryonet:2.21'
+
+
+        compileOnly 'org.projectlombok:lombok:1.18.28'
+        annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+        testCompileOnly 'org.projectlombok:lombok:1.18.28'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+    }
+}
+
+project(":shared"){
+    apply plugin: "java-library"
+
+
+    dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.28'
+    }
+}
+
+

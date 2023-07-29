@@ -3,4 +3,4 @@ sourceCompatibility = 11
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-eclipse.project.name = appName + "-server"
+eclipse.project.name = appName + "-shared"

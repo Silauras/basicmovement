@@ -1,0 +1,3 @@
+rootProject.name = 'SimpleMultiplayerRPG'
+
+include 'desktop', 'core', 'entities', 'shared', 'server'
