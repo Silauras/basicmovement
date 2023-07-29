@@ -3,6 +3,7 @@ package com.silauras.client;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -12,17 +13,33 @@ public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Character character;
 	private Tilemap tilemap;
-	
+
+	private OrthographicCamera camera;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		character = new Character(new Vector2(10, 10), new Texture("basic_character.png"));
-		tilemap = new Tilemap(10, 10, 32, 32, new Texture("basic_floor_tile.png"));
+		character = new Character(new Vector2(10, 10), new Texture(TextureConstants.BASIC_CHARACTER_TEXTURE_PATH));
+		tilemap = new Tilemap(10, 10, 32, 32, new Texture(TextureConstants.BASIC_FLOOR_TILE_TEXTURE_PATH));
+
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		camera.position.set(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f, 0);
+		camera.update();
 	}
 
 	@Override
 	public void render() {
+		// Обработка пользовательского ввода
 		handleKeyboardInput();
+
+		// Обновление позиции камеры в соответствии с позицией персонажа
+		camera.position.set(character.getPosition().x + character.getTexture().getWidth() / 2f,
+				character.getPosition().y + character.getTexture().getHeight() / 2f, 0);
+		camera.update();
+
+		// Устанавливаем матрицу проекции для SpriteBatch
+		batch.setProjectionMatrix(camera.combined);
 
 		ScreenUtils.clear(0, 0, 0, 1);
 		batch.begin();
