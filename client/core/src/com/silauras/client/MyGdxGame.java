@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -15,6 +16,9 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Tilemap tilemap;
 
 	private OrthographicCamera camera;
+	private Vector2 desiredPosition; // Позиция, к которой стремится камера
+	private final static float CAMERA_LERP_SPEED = 0.1f; // Скорость интерполяции (значение от 0 до 1)
+
 
 	@Override
 	public void create () {
@@ -26,6 +30,9 @@ public class MyGdxGame extends ApplicationAdapter {
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.position.set(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f, 0);
 		camera.update();
+
+		// Инициализируем желаемую позицию камеры
+		desiredPosition = new Vector2(camera.position.x, camera.position.y);
 	}
 
 	@Override
@@ -33,9 +40,14 @@ public class MyGdxGame extends ApplicationAdapter {
 		// Обработка пользовательского ввода
 		handleKeyboardInput();
 
-		// Обновление позиции камеры в соответствии с позицией персонажа
-		camera.position.set(character.getPosition().x + character.getTexture().getWidth() / 2f,
-				character.getPosition().y + character.getTexture().getHeight() / 2f, 0);
+		// Обновляем желаемую позицию камеры на основе позиции персонажа
+		desiredPosition.set(character.getPosition().x + character.getTexture().getWidth() / 2f,
+				character.getPosition().y + character.getTexture().getHeight() / 2f);
+
+		// Интерполируем текущую позицию камеры к желаемой позиции
+		float lerpX = Interpolation.linear.apply(camera.position.x, desiredPosition.x, CAMERA_LERP_SPEED);
+		float lerpY = Interpolation.linear.apply(camera.position.y, desiredPosition.y, CAMERA_LERP_SPEED);
+		camera.position.set(lerpX, lerpY, 0);
 		camera.update();
 
 		// Устанавливаем матрицу проекции для SpriteBatch
