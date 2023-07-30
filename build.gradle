@@ -36,8 +36,8 @@ allprojects {
         gradlePluginPortal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url "https://jitpack.io" }
     }
+
 }
 
 project(":desktop") {
@@ -61,6 +61,11 @@ project(":core") {
     dependencies {
         implementation project(":entities")
         implementation project(":shared")
+        implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
+
+        compileOnly 'org.projectlombok:lombok:1.18.28'
+        annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
@@ -76,6 +81,7 @@ project(":entities"){
 
     dependencies {
         compileOnly 'org.projectlombok:lombok:1.18.28'
+        annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
@@ -92,16 +98,11 @@ project(":server"){
 
     dependencies {
         implementation project(":shared")
-        testImplementation platform('org.junit:junit-bom:5.9.1')
-        testImplementation 'org.junit.jupiter:junit-jupiter'
-        implementation 'kryonet:kryonet:2.21'
+        implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
 
 
         compileOnly 'org.projectlombok:lombok:1.18.28'
         annotationProcessor 'org.projectlombok:lombok:1.18.28'
-
-        testCompileOnly 'org.projectlombok:lombok:1.18.28'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
     }
 }
 
@@ -111,6 +112,7 @@ project(":shared"){
 
     dependencies {
         compileOnly 'org.projectlombok:lombok:1.18.28'
+        annotationProcessor 'org.projectlombok:lombok:1.18.28'
     }
 }
 

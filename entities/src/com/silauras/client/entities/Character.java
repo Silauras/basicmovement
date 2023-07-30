@@ -2,7 +2,11 @@ package com.silauras.client.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public abstract  class Character {
 
     private final Texture texture;

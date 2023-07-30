@@ -10,11 +10,15 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.silauras.client.entities.Character;
+import com.silauras.client.entities.NetworkCharacter;
+import com.silauras.client.entities.NetworkPlayerCharacter;
 import com.silauras.client.entities.PlayerCharacter;
+
+import java.io.IOException;
 
 public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
-	private Character character;
+	private NetworkCharacter character;
 	private Tilemap tilemap;
 
 	private OrthographicCamera camera;
@@ -22,11 +26,13 @@ public class MyGdxGame extends ApplicationAdapter {
 	private float lerpSpeed = 0.1f; // Скорость интерполяции (значение от 0 до 1)
 	private float cameraZoom = 1.0f; // Масштаб камеры
 
+	private GameClient gameClient;
+
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		character = new PlayerCharacter(new Vector2(10, 10), new Texture(TextureConstants.BASIC_CHARACTER_TEXTURE_PATH));
+		character = new NetworkPlayerCharacter(new Vector2(10, 10), new Texture(TextureConstants.BASIC_CHARACTER_TEXTURE_PATH));
 		tilemap = new Tilemap(10, 10, 32, 32, new Texture(TextureConstants.BASIC_FLOOR_TILE_TEXTURE_PATH));
 
 		camera = new OrthographicCamera();
@@ -36,6 +42,16 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		// Инициализируем желаемую позицию камеры
 		desiredPosition = new Vector2(camera.position.x, camera.position.y);
+
+		// Инициализируем клиент и устанавливаем соединение с сервером
+		gameClient = new GameClient();
+		try {
+			gameClient.connect();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// Добавляем персонажа клиента в список персонажей
+		gameClient.addCharacter(0, character);
 	}
 
 	@Override
@@ -47,11 +63,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		// Устанавливаем матрицу проекции для SpriteBatch
 		batch.setProjectionMatrix(camera.combined);
 
+		// Обновляем клиент
+		gameClient.update();
+
 		ScreenUtils.clear(0, 0, 0, 1);
 		batch.begin();
 		tilemap.draw(batch);
 		batch.draw(character.getTexture(), character.getPosition().x, character.getPosition().y);
 		batch.end();
+
+		// Обрабатываем ответ от сервера
+		handleServerResponse();
 	}
 
 	@Override
@@ -100,6 +122,13 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
 			character.getPosition().y -= speed;
+		}
+	}
+
+	private void handleServerResponse() {
+		for (NetworkCharacter character : gameClient.getCharacters().values()) {
+			// Обновляем положение персонажа на основе данных от сервера
+			character.setPosition(gameClient.getPosition(character.getId()));
 		}
 	}
 }
